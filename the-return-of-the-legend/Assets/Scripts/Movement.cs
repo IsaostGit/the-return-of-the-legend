@@ -5,22 +5,87 @@ using UnityEngine;
 public class Movement : MonoBehaviour
 {
     public float moveSpeed;
+    public float jumpSpeed;
+    public float jumpTime;
+    public float fallSpeed;
+    
+    [SerializeField] private bool _isGrounded;
+    [SerializeField] private bool _isJumping;
+    float currentTime = 0;
+
+    private BoxCollider2D playerCollider;
+    private Rigidbody2D rb;
+
 
     void Start()
     {
-        
+        playerCollider = GetComponent<BoxCollider2D>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
+        Vector2 velocity = rb.velocity;
+
+        // Horizontal movement using Input.GetKey
         if (Input.GetKey("a"))
         {
-            transform.position += new Vector3(-moveSpeed, 0, 0) * Time.deltaTime;
+            velocity.x = -moveSpeed;
+        }
+        else if (Input.GetKey("d"))
+        {
+            velocity.x = moveSpeed;
+        }
+        else
+        {
+            velocity.x = 0; 
         }
 
-        if (Input.GetKey("d"))
+        // Jumping logic
+        if (Input.GetKey("space") && _isGrounded)
         {
-            transform.position += new Vector3(moveSpeed, 0, 0) * Time.deltaTime;
+            _isJumping = true;
+            currentTime = 0; 
+        }
+
+        if (_isJumping)
+        {
+            _isGrounded = false;
+            if (currentTime < jumpTime)
+            {
+                currentTime += Time.deltaTime;
+                velocity.y = jumpSpeed;
+            }
+            else
+            {
+                _isJumping = false;
+            }
+        }
+
+        if (!_isJumping && !_isGrounded)
+        {
+            velocity.y = -fallSpeed;
+        }
+
+        rb.velocity = velocity;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        Debug.Log("Collision");
+        if (collision.gameObject.CompareTag("Ground") && collision.otherCollider is BoxCollider2D)
+        {
+            _isGrounded = true;
+            Debug.Log("_isGrounded true");
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground") && collision.otherCollider is BoxCollider2D)
+        {
+            _isGrounded = false;
+            Debug.Log("_isGrounded false");
         }
     }
 }
