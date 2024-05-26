@@ -42,3 +42,18 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Background
+    uniqueID: 1675796999
+    locked: 0
+  - name: House
+    uniqueID: 488956715
+    locked: 0
+  - name: Ground
+    uniqueID: 1162155039
+    locked: 0
+  - name: Player
+    uniqueID: 485896675
+    locked: 0
+  - name: Bullet
+    uniqueID: 2723632393
+    locked: 0

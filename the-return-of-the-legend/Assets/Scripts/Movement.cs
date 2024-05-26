@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Movement : MonoBehaviour
@@ -8,7 +9,9 @@ public class Movement : MonoBehaviour
     public float jumpSpeed;
     public float jumpTime;
     public float fallSpeed;
-    
+
+    private Animator _playerAnimator;
+    private Transform _playerTransform;
     [SerializeField] private bool _isGrounded;
     [SerializeField] private bool _isJumping;
     float currentTime = 0;
@@ -21,6 +24,8 @@ public class Movement : MonoBehaviour
     {
         playerCollider = GetComponent<BoxCollider2D>();
         rb = GetComponent<Rigidbody2D>();
+        _playerTransform = GetComponent<Transform>();
+        _playerAnimator = GetComponent<Animator>();
     }
 
     void Update()
@@ -31,21 +36,32 @@ public class Movement : MonoBehaviour
         if (Input.GetKey("a"))
         {
             velocity.x = -moveSpeed;
+            _playerTransform.localScale = new Vector3(-1,1,1);
+            if (_isGrounded)
+            {
+                _playerAnimator.SetBool("IsRunning", true);
+            }
         }
         else if (Input.GetKey("d"))
         {
             velocity.x = moveSpeed;
+            _playerTransform.localScale = new Vector3(1, 1, 1);
+            if (_isGrounded)
+            {
+                _playerAnimator.SetBool("IsRunning", true);
+            }
         }
         else
         {
-            velocity.x = 0; 
+            velocity.x = 0;
+            _playerAnimator.SetBool("IsRunning", false);
         }
 
         // Jumping logic
         if (Input.GetKey("space") && _isGrounded)
         {
             _isJumping = true;
-            currentTime = 0; 
+            currentTime = 0;
         }
 
         if (_isJumping)
@@ -85,6 +101,7 @@ public class Movement : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground") && collision.otherCollider is BoxCollider2D)
         {
             _isGrounded = false;
+            _playerAnimator.SetBool("IsRunning", false);
             Debug.Log("_isGrounded false");
         }
     }
